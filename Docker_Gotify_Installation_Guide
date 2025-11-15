@@ -1,0 +1,49 @@
+Docker Lab Documentation 
+
+I tried installing through the terminal and got this output when I tested it. I realized I was actually following instructions for installing Docker Engine, rather than Docker Desktop. 
+
+ 
+
+To be safe, I deleted it and downloaded Docker Desktop Installer.exe from this website. (https://docs.docker.com/engine/install/ubuntu/#uninstall-old-versions).  
+
+I set up the apt repository using the following commands: 
+
+sudo install -m 0755 -d /etc/apt/keyrings 
+
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc 
+
+sudo chmod a+r /etc/apt/keyrings/docker.asc 
+
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF 
+Types: deb 
+URIs: https://download.docker.com/linux/ubuntu 
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") 
+Components: stable 
+Signed-By: /etc/apt/keyrings/docker.asc 
+EOF 
+
+sudo apt update 
+
+Since the VM did not have an installer app to use, I used the terminal to install Docker. I used the command “sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin" to download the docker compose files.  
+
+Then, I checked if it was working with “sudo systemctl status docker” and received this output. As you can see, the docker is enabled and active. 
+
+I chose to download Gotify and used the “sudo docker pull gotify/server” to get the image from the server. 
+
+Then, I created the yml file with the cat command and the specifications in the picture. 
+
+ 
+
+ 
+
+This is another view of the yml configuration file. 
+
+ 
+
+Next, test that Gotify is working by going to a browser and searching “localhost” (the http is automatically prepended). When the site loads, the default username and password are both “admin”. 
+
+Upon logging in, you can verify that Gotify is up and running on the docker. Yay! 
+
+ 
+
+ 
