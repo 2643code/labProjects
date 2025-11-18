@@ -1,1 +1,105 @@
-ArchLinux Installation Documentation
+ArchLinux Installation Documentation: 
+
+I started by reading through the ARCH Linux installation wiki. I downloaded one of the basic iso files and set up a new VM with the following specifications: 
+
+Linux 
+
+Other x64 system 
+
+Once the new VM has been created, turn it off and switch the setting to UEFI. 
+
+The system files were not loading and repeatedly gave an error screen. 
+
+ 
+
+After increasing the RAM to a little over the recommended amount, it booted up properly. 
+
+ 
+
+To check the mode, I input “cat /sys/firmware/efi/fw_platform_size” to an output of 64, confirming it was in UEFI mode. 
+
+ 
+
+ 
+
+When trying to establish a wireless network connection, I ran into several issues. The device list was empty and despite using “rfkill unblock all”, no station or device was listed. Attempts to enable the wifi had no success, so I went to the Cyber Lab Tutoring hours on Friday at 12:30. Unfortunately they were closed until 2pm, and I had a class at that time, so I tried again on my own to no avail. I was able to return around 3pm but there was only one student there, and she had not taken the System Administration course. She tried to help but I had to leave for work soon after, and she wrote my name down so another tutor can be there on Monday to assist. I went on Monday but no one was there, so I asked my professor for assistance with the network errors and received advice.  I intended to go back at 4pm, but I had an impromptu work interview at 4:30pm and was thus unable to return. However, I returned later that week and a tutor explained that I had to be in a bridged network, not NAT, which I had not considered when setting up the VM. 
+
+ 
+
+I created a new VM with the previous settings, but ensured it was on bridged network settings. After putting it in UEFI mode, start the setup by creating two partitions within /dev/sda. I initially created three, but the only necessary partitions are a large Linux root (x86 –64) and a 1G BIOS boot. 
+
+ 
+
+ 
+
+Once the partitions are created, the order of mounting is very important. First mount /dev/sda1 with “mount /dev/sda1 /mnt”. Then create a filesystem in the ext4 format with “mkfs.ext4 /dev/sda1 /mnt”. Once the first partition is mounted, begin setting up the boot partition. Mount it with “mount /dev/sda2 /mnt/boot”, and create a FAT32 file system for it with “mkfs.fat -F 32 /dev/sda2 /mnt/boot”. 
+
+Next, generate an Fstab file with “genfstab -U /mnt >> /mnt/etc/fstab” 
+
+After setting up the partitions, use “arch-chroot /mnt” and begin downloading system files.  Start with basic linux using “pacstrap -K /mnt base linux linux-firmware"  
+
+ 
+
+After installing of your desired packages, change directories into the root directory and finish some basic setup. 
+
+I synchronized the hardware clock with “hwclock --systohc” 
+
+Set up a hostname for your network. I chose godzilla and used the command “echo “godzilla” > /etc/hostname”. Then, I configured it with this extended command: 
+
+echo -e "127.0.0.1\tlocalhost\n::1\tlocalhost\n127.0.1.1\tarchvm.localdomain godzilla" >> /etc/hosts 
+
+Set your root password with passwd. 
+
+ 
+
+In the /boot directory, download your desired bootloader. I chose grub and downloaded it with “pacman –S grub”, and installed with “grub-install --target=i386-pc /dev/sda”. You must also create a configuration file with “grub-mkconfig -o /boot/grub/grub.cfg” The configuration file is very important for the bootloader to work properly. 
+
+I ran into many errors with this section and ended up downloading efibootmanager with “pacman –S efibootmgr”, installing ca certificates with “pacman -S ca_certificates”, and creating a vconsole file as it kept throwing errors without one. 
+
+ 
+
+ 
+
+Group 1, Grouped object  
+
+After many different fixes, I finally got into Arch Linux!  
+
+Then, I created users codi and jennifer using “useradd -m -G wheel jennifer” (plus an additional useradd command for the other user) and used passwd to create their passwords (sysadmin and d33z). 
+
+I downloaded a desktop environment, opting for XFCE and lightdm using the following commands: 
+
+pacman -S xfce4  
+
+downloads the DE (desktop environment) 
+
+pacman -S lightdm lightdm-gtk-greeter 
+
+downloads the lightdm startup screen 
+
+systemctl enable lightdm 
+
+allows lightdm to run properly 
+
+The desktop environment is up and running!! 
+
+ 
+
+I also downloaded different shells, using “pacman -S zsh” and “chsh -s /usr/bin/zsh jennifer” (plus an additional chsh command for the other user) 
+
+I installed openssh with “pacman -S openssh” and enabled it with “systemctl enable sshd” and “systemctl start sshd” 
+
+pacman downloads the package 
+
+systemctl enable allows openssh to run with the proper permissions 
+
+systemctl start activates the openssh package 
+
+Then, I used nano to edit the /etc/pacman.conf file to give pacman colors in the terminal. To do this, simply uncomment the COLOR line in the file. 
+
+Getting the other terminal colors was a bit trickier. I edited the bash.bashrc file and input aliases, including “alias ls='ls --color=auto'” 
+
+ 
+
+I also added some alieses for convenience, such as ‘update’. This was done with the command “echo "alias update='sudo pacman -Syu'" >> ~/.zshrc” 
+
+Then, I installed firefox with “sudo pacman –S firefox” 
